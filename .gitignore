@@ -1,0 +1,19 @@
+build/
+.gradle/
+.idea/
+*.iml
+*.ipr
+*.iws
+out/
+
+# Nextflow runtime
+.nextflow/
+.nextflow.log*
+work/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Gradle wrapper JAR is checked in
+!gradle/wrapper/gradle-wrapper.jar

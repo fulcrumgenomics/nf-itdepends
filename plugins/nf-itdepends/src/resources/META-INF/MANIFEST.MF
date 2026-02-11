@@ -1,0 +1,6 @@
+Manifest-Version: 1.0
+Plugin-Id: nf-itdepends
+Plugin-Version: 0.1.0
+Plugin-Class: nextflow.itdepends.ItDependsPlugin
+Plugin-Provider: fulcrumgenomics
+Plugin-Requires: >=24.04.0

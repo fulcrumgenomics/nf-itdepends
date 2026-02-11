@@ -1,0 +1,113 @@
+# nf-itdepends
+
+A Nextflow plugin that restores `@Grab` (Groovy Grape) dependency resolution for Groovy classes in the `lib/` directory.
+
+## Background
+
+Starting with Nextflow 24.04.7-edge, [Apache Ivy was removed](https://github.com/nextflow-io/nextflow/issues/5234) from the Nextflow distribution. This broke the `@Grab` annotation, which relies on Ivy to resolve and download Maven dependencies at compile time. The Nextflow team's position is that `@Grab` was never officially supported; users should vendor JARs into `lib/` or write a plugin instead.
+
+This plugin brings `@Grab` back by bundling Ivy and injecting a working `GrapeEngine` into Groovy's `Grape` singleton before `lib/` files are compiled.
+
+## How it works
+
+The plugin exploits a timing window in the Nextflow session lifecycle:
+
+1. `Session.init()` creates `TraceObserverFactory` instances, calling `ItDependsFactory.create(session)`
+2. The factory creates an `ItDependsGrapeEngine` — a full `GrapeEngine` implementation backed by Apache Ivy, loaded from the plugin's own classloader (which bundles Ivy as a dependency)
+3. It sets `Grape.instance` to this engine via reflection
+4. Later, when `ScriptLoader.parse()` compiles `lib/` Groovy files, `@Grab` annotations fire and call our engine
+5. Our engine resolves dependencies from Maven Central, downloads JARs to `~/.groovy/grapes`, and adds them to the `GroovyClassLoader`
+
+## Usage
+
+Add the plugin to your `nextflow.config`:
+
+```groovy
+plugins {
+    id 'nf-itdepends@0.1.0'
+}
+```
+
+Then use `@Grab` in your `lib/` Groovy files as before:
+
+```groovy
+// lib/MyHelper.groovy
+@Grab('commons-lang:commons-lang:2.6')
+import org.apache.commons.lang.StringUtils
+
+class MyHelper {
+    static String capitalize(String input) {
+        return StringUtils.capitalize(input)
+    }
+}
+```
+
+```groovy
+// main.nf
+process EXAMPLE {
+    output: stdout
+    script:
+    """
+    echo "${MyHelper.capitalize('hello world')}"
+    """
+}
+
+workflow {
+    EXAMPLE() | view
+}
+```
+
+## Installation
+
+### From source
+
+```bash
+git clone https://github.com/fulcrumgenomics/nf-itdepends.git
+cd nf-itdepends
+make assemble
+cp -r build/plugins/nf-itdepends-0.1.0 ~/.nextflow/plugins/
+```
+
+### Manual install
+
+Download the plugin ZIP from the [releases page](https://github.com/fulcrumgenomics/nf-itdepends/releases) and unzip it into `~/.nextflow/plugins/`:
+
+```bash
+unzip nf-itdepends-0.1.0.zip -d ~/.nextflow/plugins/nf-itdepends-0.1.0
+```
+
+## Configuration
+
+By default, the plugin resolves dependencies from Maven Central. Additional resolvers can be configured using `@GrabResolver` in your Groovy code:
+
+```groovy
+@GrabResolver(name='sonatype', root='https://oss.sonatype.org/content/repositories/releases/')
+@Grab('some.group:some-artifact:1.0')
+import some.group.SomeClass
+```
+
+Dependencies are cached in `~/.groovy/grapes/` (the standard Grape cache directory).
+
+## Requirements
+
+- Nextflow 24.04.0 or later
+- Java 17 or later
+
+## Development
+
+```bash
+# Build the plugin
+make assemble
+
+# Run tests
+make test
+
+# Clean build artifacts
+make clean
+```
+
+## License
+
+[MIT](LICENSE)
+
+Copyright (c) 2026 Fulcrum Genomics LLC

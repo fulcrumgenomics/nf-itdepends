@@ -1,0 +1,64 @@
+plugins {
+    id 'io.nextflow.groovy-library-conventions'
+    id 'idea'
+}
+
+group = 'io.nextflow'
+
+idea {
+    module.inheritOutputDirs = true
+}
+
+repositories {
+    mavenCentral()
+    maven { url = 'https://jitpack.io' }
+    maven { url = 'https://s3-eu-west-1.amazonaws.com/maven.seqera.io/releases' }
+    maven { url = 'https://s3-eu-west-1.amazonaws.com/maven.seqera.io/snapshots' }
+}
+
+configurations {
+    runtimeClasspath.exclude group: 'org.slf4j', module: 'slf4j-api'
+}
+
+sourceSets {
+    main.java.srcDirs = []
+    main.groovy.srcDirs = ['src/main']
+    main.resources.srcDirs = ['src/resources']
+    test.groovy.srcDirs = ['src/test']
+    test.java.srcDirs = []
+    test.resources.srcDirs = ['src/testResources']
+}
+
+ext {
+    nextflowVersion = '25.01.0-edge'
+}
+
+dependencies {
+    compileOnly "io.nextflow:nextflow:$nextflowVersion"
+    compileOnly 'org.slf4j:slf4j-api:2.0.16'
+    compileOnly 'org.pf4j:pf4j:3.12.0'
+
+    // Bundle Apache Ivy so @Grab can work again
+    implementation 'org.apache.ivy:ivy:2.5.2'
+
+    // Test dependencies
+    testImplementation "org.apache.groovy:groovy:4.0.26"
+    testImplementation "org.apache.groovy:groovy-nio:4.0.26"
+    testImplementation "io.nextflow:nextflow:$nextflowVersion"
+    testImplementation ("org.apache.groovy:groovy-test:4.0.26") { exclude group: 'org.apache.groovy' }
+    testImplementation ("cglib:cglib-nodep:3.3.0")
+    testImplementation ("org.objenesis:objenesis:3.1")
+    testImplementation ("org.spockframework:spock-core:2.3-groovy-4.0") { exclude group: 'org.apache.groovy'; exclude group: 'net.bytebuddy' }
+    testImplementation ('org.spockframework:spock-junit4:2.3-groovy-4.0') { exclude group: 'org.apache.groovy'; exclude group: 'net.bytebuddy' }
+    testImplementation ('com.google.jimfs:jimfs:1.1')
+    testImplementation(testFixtures("io.nextflow:nextflow:$nextflowVersion"))
+    testImplementation(testFixtures("io.nextflow:nf-commons:$nextflowVersion"))
+
+    modules {
+        module("commons-logging:commons-logging") { replacedBy("org.slf4j:jcl-over-slf4j") }
+    }
+}
+
+test {
+    useJUnitPlatform()
+}
