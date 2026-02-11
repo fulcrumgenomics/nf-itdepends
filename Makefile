@@ -1,43 +1,23 @@
-config ?= compileClasspath
+.PHONY: assemble clean test install release
 
-ifdef module
-mm = :${module}:
-else
-mm =
-endif
+# Build the plugin
+assemble:
+	./gradlew assemble
 
 clean:
 	rm -rf .nextflow*
 	rm -rf work
 	rm -rf build
-	rm -rf plugins/*/build
 	./gradlew clean
 
-compile:
-	./gradlew compileGroovy
-	@echo "DONE `date`"
-
-check:
-	./gradlew check
-
-deps:
-	./gradlew -q ${mm}dependencies --configuration ${config}
-
+# Run plugin unit tests
 test:
-ifndef class
-	./gradlew ${mm}test
-else
-	./gradlew ${mm}test --tests ${class}
-endif
+	./gradlew test
 
-assemble:
-	./gradlew assemble
+# Install the plugin into local nextflow plugins dir
+install:
+	./gradlew installPlugin
 
-buildPlugins:
-	./gradlew copyPluginZip
-
-upload:
-	./gradlew upload
-
-publish-index:
-	./gradlew plugins:publishIndex
+# Publish the plugin to the registry
+release:
+	./gradlew releasePlugin
