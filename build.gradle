@@ -1,0 +1,28 @@
+plugins {
+    id 'io.nextflow.nextflow-plugin' version '1.0.0-beta.14'
+}
+
+version = '0.1.0'
+
+nextflowPlugin {
+    nextflowVersion = '24.04.0'
+    provider = 'fulcrumgenomics'
+    className = 'nextflow.itdepends.ItDependsPlugin'
+    extensionPoints = [
+        'nextflow.itdepends.ItDependsFactory'
+    ]
+}
+
+repositories {
+    mavenCentral()
+}
+
+configurations {
+    // Ivy may pull in slf4j transitively; exclude it since Nextflow provides its own
+    runtimeClasspath.exclude group: 'org.slf4j', module: 'slf4j-api'
+}
+
+dependencies {
+    // Bundle Apache Ivy so @Grab can work again
+    implementation 'org.apache.ivy:ivy:2.5.3'
+}
