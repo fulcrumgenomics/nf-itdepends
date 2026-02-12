@@ -1,5 +1,7 @@
 # nf-itdepends
 
+[![Nextflow Registry](https://img.shields.io/badge/Nextflow_Registry-nf--itdepends-blue?logo=nextflow)](https://registry.nextflow.io/plugins/nf-itdepends)
+
 A Nextflow plugin that restores `@Grab` (Groovy Grape) dependency resolution for Groovy classes in the `lib/` directory.
 
 ## Summary
