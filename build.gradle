@@ -6,7 +6,7 @@ version = '0.1.0'
 
 nextflowPlugin {
     nextflowVersion = '24.04.0'
-    provider = 'fulcrumgenomics'
+    provider = 'Fulcrum Genomics'
     className = 'nextflow.itdepends.ItDependsPlugin'
     extensionPoints = [
         'nextflow.itdepends.ItDependsFactory'
