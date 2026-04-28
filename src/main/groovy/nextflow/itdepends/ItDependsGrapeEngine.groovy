@@ -95,7 +95,7 @@ class ItDependsGrapeEngine implements GrapeEngine {
                 continue
             }
 
-            log.info "nf-itdepends: resolving ${key}"
+            log.debug "nf-itdepends: resolving ${key}"
 
             try {
                 def uris = doResolve(group, module, version)
@@ -150,7 +150,7 @@ class ItDependsGrapeEngine implements GrapeEngine {
             ivy.getSettings().addResolver(resolver)
             // Also add to the default chain so it's used during resolution
             chain.add(resolver)
-            log.info "nf-itdepends: added resolver '${name}' -> ${root}"
+            log.debug "nf-itdepends: added resolver '${name}' -> ${root}"
         }
     }
 

@@ -43,7 +43,7 @@ class ItDependsFactory implements TraceObserverFactory {
             instanceField.setAccessible(true)
             instanceField.set(null, engine)
 
-            log.info "nf-itdepends: @Grab support restored (Ivy ${getIvyVersion()})"
+            log.debug "nf-itdepends: @Grab support restored (Ivy ${getIvyVersion()})"
 
         } catch (Exception e) {
             log.error "nf-itdepends: failed to inject GrapeEngine — @Grab will not work", e
